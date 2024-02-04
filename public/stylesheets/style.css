@@ -1,0 +1,51 @@
+body {
+  padding: 50px;
+  font: 16px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+.intro {
+  margin: 10px 0;
+}
+
+#user-input {
+  padding: 10px 7px;
+  border-radius: 5px;
+  border: 1px solid grey;
+  width: 350px;
+  font-size: 16px;
+}
+
+#user-input:focus + #suggestion-wrapper {
+  display: block;
+}
+
+.input-wrapper {
+  width: fit-content;
+}
+#suggestion-wrapper {
+  padding: 5px 0;
+  margin-top: 4px;
+  max-height: 228px;
+  width: 360x;
+  overflow-y: auto;
+  display: none;
+  border: 1px solid #bbb;
+  border-radius: 5px;
+}
+
+#suggestion-wrapper > div {
+  padding: 5px 8px;
+}
+
+#suggestion-wrapper > div:hover {
+  background-color: #eee;
+}
+
+.no-matched {
+  color: #bbb;
+}
+
+.suggest-word.active {
+  background-color: #007bff;
+}
+

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title></title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+      integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+  </head>
+  <body>
+    <div class="input-wrapper">
+      <div class="intro">select a U.S. state</div>
+      <input type="text" id="user-input" name="user-input">
+      <div id="suggestion-wrapper">
+      </div>
+    </div>
+    <script>
+      var states = []
+      var filteredStates = []
+      var pattern = null
+      // get states
+      $.ajax({
+        type: 'GET',
+        url: '/states',
+        contentType: "application/json; charset=utf-8",
+        dataType: 'json',
+        success: function (res) {
+          states = res.states.sort((a, b) => a - b)
+          for (const state of states) {
+            $('#suggestion-wrapper').append(`<div class="suggest-word">${state}</div>`)
+          }
+        }
+      })
+      // detect input value
+      $('#user-input').on("input", function (event) {
+        $('#suggestion-wrapper').show()
+        if(event.target.value === '') {
+          newStatus(states)
+        } else {
+          refreshStates(event.target.value)
+        }
+      })
+      // while click change input value
+      $(document).on("mousedown", "#suggestion-wrapper", function (event) {
+        $('#user-input').val(event.target.innerText)
+        refreshStates(event.target.innerText)
+      });
+
+
+      // click up and down
+      $('#user-input').on("keydown", function (e) {
+        if(![38, 40, 13].includes(e.keyCode)) return
+
+        const targets = $(".suggest-word")
+        if (!targets.length) return
+        const activeTarget = $(".suggest-word.active")[0]
+        // up
+        if(e.keyCode === 38) {
+          if (activeTarget) {
+            if ($(activeTarget).position().top < 200) {
+              $('#suggestion-wrapper').animate({ scrollTop: '-=150px' }, 300);
+            }
+            $(activeTarget).removeClass('active')
+            $(activeTarget).prev().addClass('active')
+          }
+        // down
+        } else if (e.keyCode === 40) {
+
+          if(!activeTarget) {
+            $(targets[0]).addClass('active')
+          } else {
+            if($(activeTarget).position().top > 300) {
+              $('#suggestion-wrapper').animate({ scrollTop: '+=150px' }, 300);
+            }
+            if($(activeTarget).next()) {
+              $(activeTarget).removeClass('active')
+              $(activeTarget).next().addClass('active')
+            }
+          }
+        // enter
+        } else if (e.keyCode === 13) {
+          if (activeTarget) {
+            $(activeTarget).removeClass('active')
+            $('#user-input').val($(activeTarget).html())
+            refreshStates($(activeTarget).html())
+          }
+        }
+      });
+
+      // clean and append states
+      function newStatus (states) {
+        $('#suggestion-wrapper').empty()
+        for (const state of states) {
+          $('#suggestion-wrapper').append(`<div class="suggest-word">${state}</div>`)
+        }
+      }
+      function showNotMatched () {
+
+        $('#suggestion-wrapper').empty()
+        setTimeout(
+          () => {
+            $('#suggestion-wrapper').append('<div class="no-matched">No Matched found</div>')
+          }
+          ,1)
+        
+      }
+      function refreshStates (string) {
+        pattern = new RegExp(string, 'i')
+        filteredStates = states.filter(
+          (state) => state.match(pattern)
+        )
+        if (filteredStates.length === 0) {
+          showNotMatched()
+        }
+        newStatus(filteredStates)
+      }
+    </script>
+  </body>
+</html>
