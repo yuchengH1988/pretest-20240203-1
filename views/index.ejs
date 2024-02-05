@@ -56,8 +56,9 @@
         // up
         if(e.keyCode === 38) {
           if (activeTarget) {
+            if ($(activeTarget).is(':first-child')) return
             if ($(activeTarget).position().top < 200) {
-              $('#suggestion-wrapper').animate({ scrollTop: '-=150px' }, 300);
+              $('#suggestion-wrapper').animate({ scrollTop: '-=150px' }, 80);
             }
             $(activeTarget).removeClass('active')
             $(activeTarget).prev().addClass('active')
@@ -68,8 +69,10 @@
           if(!activeTarget) {
             $(targets[0]).addClass('active')
           } else {
+            if ($(activeTarget).is(':last-child')) return
+
             if($(activeTarget).position().top > 300) {
-              $('#suggestion-wrapper').animate({ scrollTop: '+=150px' }, 300);
+              $('#suggestion-wrapper').animate({ scrollTop: '+=150px' }, 80);
             }
             if($(activeTarget).next()) {
               $(activeTarget).removeClass('active')
@@ -94,14 +97,12 @@
         }
       }
       function showNotMatched () {
-
         $('#suggestion-wrapper').empty()
         setTimeout(
           () => {
             $('#suggestion-wrapper').append('<div class="no-matched">No Matched found</div>')
           }
           ,1)
-        
       }
       function refreshStates (string) {
         pattern = new RegExp(string, 'i')
